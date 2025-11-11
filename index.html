@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Vendas com Firebase Realtime Database</title>
+    <link rel="stylesheet" href="style.css"> 
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // === SUAS CREDENCIAIS COMPLETAS DO FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH3KGcScGqG-PDuAe3lx4Yk9XTOnlBbok",
+            authDomain: "casa-be234.firebaseapp.com",
+            databaseURL: "https://casa-be234-default-rtdb.firebaseio.com", 
+            projectId: "casa-be234",
+            storageBucket: "casa-be234.firebasestorage.app",
+            messagingSenderId: "480745692345",
+            appId: "1:480745692345:web:4428eab42ea300cc9e0f68",
+            measurementId: "G-LZYFMSN2WK" 
+        };
+        // ===========================================
+
+        // Inicializa o Firebase e a referência ao Realtime Database
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database(); 
+    </script>
+</head>
+<body>
+    
+    <header id="cabecalho-estabelecimento">
+        <h1 id="nome-estabelecimento">Boteco da Gata</h1>
+        <div id="contatos-estabelecimento">
+            <p>WhatsApp: (82) 9138-7995</p>
+        </div>
+    </header>
+
+    <section id="cadastro-itens">
+        <h2>Cadastro de Produtos</h2>
+        <input type="text" id="nome-item" placeholder="Nome do Produto">
+        <input type="number" id="preco-item" placeholder="Preço Unitário" min="0" step="0.01">
+        <button id="btn-cadastrar">Cadastrar Item</button>
+
+        <h3>Itens Cadastrados (Clique 'X' para remover)</h3>
+        <ul id="lista-produtos"></ul>
+    </section>
+
+    <hr>
+    
+    <section id="cadastro-mesas">
+        <h2>Cadastro de Mesas</h2>
+        <input type="text" id="nome-mesa" placeholder="Nome ou Número da Mesa">
+        <button id="btn-cadastrar-mesa">Cadastrar Mesa</button>
+
+        <h3>Mesas Cadastradas (Clique 'X' para remover)</h3>
+        <ul id="lista-mesas"></ul>
+    </section>
+
+    <hr>
+
+    <section id="registro-vendas">
+        <h2>Venda em Mesa</h2>
+        <select id="select-mesa-ativa">
+            <option value="">-- Selecione a Mesa --</option>
+        </select>
+        <button id="btn-nova-mesa">Abrir Mesa e Carregar Pedido</button>
+        <p id="mesa-ativa-status">Nenhuma mesa ativa.</p>
+
+        <label for="descricao-mesa">Descrição da Mesa:</label>
+        <textarea id="descricao-mesa" placeholder="Anotações, detalhes do cliente, etc." rows="3" onchange="salvarDescricaoMesa()"></textarea>
+
+        <select id="select-produto">
+            <option value="">-- Selecione um Produto --</option>
+        </select>
+        <input type="number" id="quantidade" placeholder="Quantidade" min="1" value="1">
+        <button id="btn-adicionar">Adicionar à Venda</button>
+
+        <h3>Detalhes da Venda</h3>
+        <table id="tabela-venda">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Qtd</th>
+                    <th>Preço</th>
+                    <th>Total R$</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        
+        <p>Subtotal (Bruto): <span id="subtotal-bruto">R$ 0.00</span></p>
+
+        <h3>Finalização e Taxas</h3>
+        <select id="select-forma-pagamento">
+            <option value="dinheiro">Dinheiro (0,00% Taxa)</option>
+            <option value="debito">Débito (1,99% Taxa)</option>
+            <option value="credito">Crédito (4,99% Taxa)</option>
+        </select>
+        <p>Taxa Aplicada: <span id="taxa-aplicada">0,00%</span></p>
+        <p>Valor da Taxa: <span id="valor-taxa">R$ 0.00</span></p>
+        <p>Total Final: <span id="total-final">R$ 0.00</span></p>
+        
+        <button id="btn-finalizar">Finalizar Venda e Registrar Histórico</button>
+    </section>
+
+    <hr>
+
+    <section id="historico">
+        <h2>Histórico de Vendas</h2>
+        <ul id="lista-historico"></ul>
+    </section>
+
+    <script src="script.js"></script> 
+</body>
+</html>
