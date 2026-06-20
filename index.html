@@ -1,307 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco da Gata - Sistema de Vendas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-<title>Boteco da Gata</title>
+    <script>
+        // === CREDENCIAIS DO FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH3KGcScGqG-PDuAe3lx4Yk9XTOnlBbok",
+            authDomain: "casa-be234.firebaseapp.com",
+            databaseURL: "https://casa-be234-default-rtdb.firebaseio.com", 
+            projectId: "casa-be234",
+            storageBucket: "casa-be234.firebasestorage.app",
+            messagingSenderId: "480745692345",
+            appId: "1:480745692345:web:4428eab42ea300cc9e0f68",
+            measurementId: "G-LZYFMSN2WK" 
+        };
 
-<link rel="stylesheet" href="style.css">
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyBH3KGcScGqG-PDuAe3lx4Yk9XTOnlBbok",
-    authDomain: "casa-be234.firebaseapp.com",
-    databaseURL: "https://casa-be234-default-rtdb.firebaseio.com",
-    projectId: "casa-be234",
-    storageBucket: "casa-be234.firebasestorage.app",
-    messagingSenderId: "480745692345",
-    appId: "1:480745692345:web:4428eab42ea300cc9e0f68",
-    measurementId: "G-LZYFMSN2WK"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
-
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database(); 
+    </script>
 </head>
 <body>
 
-<!-- HEADER -->
+    <div class="app-container">
+        
+        <header id="cabecalho-estabelecimento">
+            <div class="logo-area">
+                <span class="icon-beer">🍺</span>
+                <h1 id="nome-estabelecimento">Boteco da Gata</h1>
+            </div>
+            <div id="contatos-estabelecimento">
+                <p><strong>WhatsApp:</strong> (82) 9138-7995</p>
+            </div>
+        </header>
 
-<header class="header">
-
-    <div>
-        <h1>
-            <i class="fa-solid fa-beer-mug-empty"></i>
-            Boteco da Gata
-        </h1>
-
-        <p>(82) 9138-7995</p>
-    </div>
-
-    <div class="header-right">
-        <button id="btn-tema">
-            <i class="fa-solid fa-moon"></i>
-        </button>
-    </div>
-
-</header>
-
-
-<!-- DASHBOARD -->
-
-<section class="dashboard">
-
-    <div class="card-dashboard">
-        <h3>Vendas Hoje</h3>
-        <span id="vendas-hoje">R$ 0,00</span>
-    </div>
-
-    <div class="card-dashboard">
-        <h3>Mesas Abertas</h3>
-        <span id="mesas-abertas">0</span>
-    </div>
-
-    <div class="card-dashboard">
-        <h3>Produtos</h3>
-        <span id="total-produtos">0</span>
-    </div>
-
-</section>
-
-
-<!-- CONTAINER -->
-
-<div class="container">
-
-    <!-- COLUNA MESAS -->
-
-    <section class="coluna">
-
-        <div class="card">
-
-            <h2>
-                <i class="fa-solid fa-table"></i>
-                Mesas
-            </h2>
-
-            <input
-                type="text"
-                id="nome-mesa"
-                placeholder="Nome ou número da mesa">
-
-            <button id="btn-cadastrar-mesa">
-                Nova Mesa
-            </button>
-
-            <hr>
-
-            <select id="select-mesa-ativa">
-                <option value="">
-                    Selecionar Mesa
-                </option>
-            </select>
-
-            <button id="btn-nova-mesa">
-                Abrir Mesa
-            </button>
-
-            <p id="mesa-ativa-status">
-                Nenhuma mesa ativa
-            </p>
-
-            <ul id="lista-mesas"></ul>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- COLUNA PEDIDO -->
-
-    <section class="coluna maior">
-
-        <div class="card">
-
-            <h2>
-                <i class="fa-solid fa-receipt"></i>
-                Pedido Atual
-            </h2>
-
-            <label>Descrição da Mesa</label>
-
-            <textarea
-                id="descricao-mesa"
-                rows="3"
-                placeholder="Observações"></textarea>
-
-            <table id="tabela-venda">
-
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Qtd</th>
-                        <th>Preço</th>
-                        <th>Total</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody></tbody>
-
-            </table>
-
-            <div class="totais">
-
-                <div>
-                    Subtotal:
-                    <span id="subtotal-bruto">
-                        R$ 0,00
-                    </span>
-                </div>
-
-                <div>
-                    Taxa:
-                    <span id="valor-taxa">
-                        R$ 0,00
-                    </span>
-                </div>
-
-                <div class="total-final-box">
-
-                    TOTAL
-
-                    <span id="total-final">
-                        R$ 0,00
-                    </span>
-
-                </div>
+        <div class="main-layout">
+            
+            <div class="sidebar-column">
+                
+                <section id="cadastro-itens" class="card">
+                    <h2>📦 Cadastro de Produtos</h2>
+                    <div class="input-group">
+                        <input type="text" id="nome-item" placeholder="Nome do Produto">
+                        <input type="number" id="preco-item" placeholder="Preço Unitário" min="0" step="0.01">
+                        <button id="btn-cadastrar" class="btn-primary">Cadastrar Item</button>
+                    </div>
+                    <h3>Itens Cadastrados</h3>
+                    <ul id="lista-produtos" class="custom-list"></ul>
+                </section>
+                
+                <section id="cadastro-mesas" class="card">
+                    <h2>🪑 Cadastro de Mesas</h2>
+                    <div class="input-group">
+                        <input type="text" id="nome-mesa" placeholder="Nome ou Número da Mesa">
+                        <button id="btn-cadastrar-mesa" class="btn-primary">Cadastrar Mesa</button>
+                    </div>
+                    <h3>Mesas Cadastradas</h3>
+                    <ul id="lista-mesas" class="custom-list"></ul>
+                </section>
 
             </div>
 
-            <hr>
+            <div class="content-column">
+                
+                <section id="registro-vendas" class="card principal">
+                    <h2>💰 Venda em Mesa / Painel de Controle</h2>
+                    
+                    <div class="mesa-selector-zone">
+                        <div class="select-wrapper">
+                            <select id="select-mesa-ativa">
+                                <option value="">-- Selecione a Mesa --</option>
+                            </select>
+                        </div>
+                        <button id="btn-nova-mesa" class="btn-accent">Abrir Mesa e Carregar Pedido</button>
+                    </div>
 
-            <select id="select-forma-pagamento">
+                    <div id="mesa-ativa-status" class="status-badge">Nenhuma mesa ativa.</div>
 
-                <option value="dinheiro">
-                    Dinheiro
-                </option>
+                    <div class="form-group">
+                        <label for="descricao-mesa">Descrição / Anotações da Mesa:</label>
+                        <textarea id="descricao-mesa" placeholder="Anotações, detalhes do cliente, fiado, etc." rows="2" onchange="salvarDescricaoMesa()"></textarea>
+                    </div>
 
-                <option value="debito">
-                    Débito
-                </option>
+                    <div class="adicionar-produto-zone">
+                        <div class="select-wrapper">
+                            <select id="select-produto">
+                                <option value="">-- Selecione um Produto --</option>
+                            </select>
+                        </div>
+                        <input type="number" id="quantidade" placeholder="Qtd" min="1" value="1">
+                        <button id="btn-adicionar" class="btn-success">Adicionar à Venda</button>
+                    </div>
 
-                <option value="credito">
-                    Crédito
-                </option>
+                    <h3>📋 Detalhes do Pedido Atual</h3>
+                    <div class="table-responsive">
+                        <table id="tabela-venda">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qtd</th>
+                                    <th>Preço</th>
+                                    <th>Total R$</th>
+                                    <th style="text-align: center;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="checkout-box">
+                        <div class="subtotal-row">
+                            <span>Subtotal (Bruto):</span>
+                            <span id="subtotal-bruto">R$ 0.00</span>
+                        </div>
 
-            </select>
+                        <div class="pagamento-row">
+                            <label>Forma de Pagamento:</label>
+                            <div class="select-wrapper short">
+                                <select id="select-forma-pagamento">
+                                    <option value="dinheiro">Dinheiro (0,00% Taxa)</option>
+                                    <option value="debito">Débito (1,99% Taxa)</option>
+                                    <option value="credito">Crédito (4,99% Taxa)</option>
+                                </select>
+                            </div>
+                        </div>
 
-            <button id="btn-finalizar" class="btn-verde">
-                Finalizar Venda
-            </button>
+                        <div class="taxas-info">
+                            <p>Taxa Aplicada: <span id="taxa-aplicada">0,00%</span></p>
+                            <p>Valor da Taxa: <span id="valor-taxa">R$ 0.00</span></p>
+                        </div>
+
+                        <div class="total-row">
+                            <span>Total Final:</span>
+                            <span id="total-final">R$ 0.00</span>
+                        </div>
+                        
+                        <button id="btn-finalizar" class="btn-checkout">Finalizar Venda e Fechar Mesa</button>
+                    </div>
+                </section>
+
+                <section id="historico" class="card">
+                    <h2>📜 Histórico Recente de Vendas</h2>
+                    <ul id="lista-historico" class="historico-list"></ul>
+                </section>
+
+            </div>
 
         </div>
-
-    </section>
-
-
-    <!-- COLUNA PRODUTOS -->
-
-    <section class="coluna">
-
-        <div class="card">
-
-            <h2>
-                <i class="fa-solid fa-burger"></i>
-                Produtos
-            </h2>
-
-            <input
-                type="text"
-                id="nome-item"
-                placeholder="Nome do Produto">
-
-            <input
-                type="number"
-                id="preco-item"
-                placeholder="Preço">
-
-            <button id="btn-cadastrar">
-                Cadastrar Produto
-            </button>
-
-            <hr>
-
-            <input
-                type="text"
-                id="pesquisa-produto"
-                placeholder="Pesquisar produto">
-
-            <select id="select-produto">
-
-                <option value="">
-                    Selecione um produto
-                </option>
-
-            </select>
-
-            <input
-                type="number"
-                id="quantidade"
-                value="1">
-
-            <button id="btn-adicionar" class="btn-azul">
-
-                <i class="fa-solid fa-plus"></i>
-
-                Adicionar
-
-            </button>
-
-            <hr>
-
-            <ul id="lista-produtos"></ul>
-
-        </div>
-
-    </section>
-
-</div>
-
-
-<!-- HISTÓRICO -->
-
-<section class="historico">
-
-    <div class="card">
-
-        <h2>
-
-            <i class="fa-solid fa-clock-rotate-left"></i>
-
-            Histórico de Vendas
-
-        </h2>
-
-        <div id="lista-historico"></div>
-
     </div>
 
-</section>
+    <div id="toast-container"></div>
 
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script> 
 </body>
 </html>
